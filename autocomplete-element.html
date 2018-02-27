@@ -1,0 +1,84 @@
+<link rel="import" href="./bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="./bower_components/paper-input/paper-input.html">
+<link rel="import" href="./bower_components/iron-ajax/iron-ajax.html">
+
+<link rel="import" href="./show-items.html">
+
+<dom-module id="autocomplete-element">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <paper-input 
+      label='[[labelInput]]'
+      value='{{inputvalue}}'>
+    </paper-input>
+
+    <show-items 
+      apply-filter = '{{inputvalue}}'
+      data = '[[data]]'
+      filter-by = '[[filterBy]]',
+      maxresult = '[[maxResult]]'
+      mincharacter = '[[minCharacter]]',
+      maininfo = '[[mainInfo]]'
+      auxinfo = '[[auxInfo]]'>
+    </show-items>
+    
+  </template>
+
+  <script>
+    /**
+     * `autocomplete-element`
+     * input with autocomplete
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class AutocompleteElement extends Polymer.Element {
+      static get is() { return 'autocomplete-element'; }
+      static get properties() {
+        return {
+          inputvalue: {
+            type: String,
+            value: ''
+          },
+          data: {
+            type: Array,
+            value: () => []
+          },
+          filterBy: {
+            type: Array,
+            value: () => []
+          },
+          maxResult: {
+            type: Number,
+            value: 5
+          },
+          minCharacter: {
+            type: Number,
+            value: 0
+          },
+          mainInfo: {
+            type: String,
+            value: ''
+          },
+          auxInfo: {
+            type: Array,
+            value: () => []
+          },
+          labelInput: {
+            type: String,
+            value: 'test'
+          }
+        };
+      }
+    }
+
+    window.customElements.define(AutocompleteElement.is, AutocompleteElement);
+  </script>
+</dom-module>

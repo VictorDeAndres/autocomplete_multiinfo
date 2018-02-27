@@ -1,0 +1,167 @@
+<link rel="import" href="./bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="./bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="./bower_components/polymer/lib/elements/dom-repeat.html">
+
+<dom-module id="show-items">
+  <template>
+    <style>
+      :host {
+        display: block;
+        font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+        color: #2471A3;
+        font-size: 14px;
+      }
+
+      .search--box {
+        box-shadow: 0 1px 3px 0 rgba(0,0,0,0.2), 0 1px 1px 0 rgba(0,0,0,0.14), 0 2px 1px -1px rgba(0,0,0,0.12);
+        padding: 0.5em;
+      }
+
+      .search--box--item {
+        padding: 0.25em 0;
+      }
+
+      .search--box--item:hover{
+        background-color: #E0F9F5;
+      }
+
+      .search--box--item__fontweight {
+        font-weight: 700;
+        padding: 0.1em 0;
+      }
+
+      .search--box--item__fontsize {
+        padding: 0.1em 0;
+        font-size: 12px;
+      }
+    </style>
+
+      <template is="dom-if" if="[[source.length]]">
+        <div class="search--box" id="currentData">
+          <dom-repeat items="[[source]]" as="sourceData">
+            <template>
+                <div class="search--box--item" on-click="_onclick">
+                  <div class="search--box--item__fontweight">[[_showMainInfo(index)]]</div>
+                  <dom-repeat items="[[auxinfo]]" as="attribute">
+                    <template>
+                      <div class="search--box--item__fontsize">[[_showAuxInfo(attribute, sourceData)]]</div>
+                    </template>
+                  </dom-repeat>
+                </div>
+            </template>
+          </dom-repeat>
+        </div>
+      </template>
+  </template>
+
+  <script>
+    /**
+     * `test-element`
+     * 
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class ShowItemsElement extends Polymer.Element {
+
+      ready() {
+        super.ready();
+        this._currentShowRow = null;
+      }
+
+      static get is() { return 'show-items'; }
+      static get properties() {
+        return {
+          applyFilter: {
+            type: String,
+            value: '',
+            notify: true,
+            observer: '_findArrayValues'
+          },
+          maxresult: {
+            type: Number,
+            value: 5
+          },
+          mincharacter: {
+            type: Number,
+            value: 0
+          },
+          maininfo: {
+            type: String,
+            value: ''
+          },
+          auxinfo: {
+            type: Array,
+            value: () => {}
+          },
+          data: {
+            type: Array,
+            value: () => []
+          },
+          filterBy: {
+            type: Array,
+            value: () => []
+          },
+          source: {
+            type: Array,
+            value: () => []
+          },
+          showData: {
+            type: Boolean,
+            value: false
+          }
+        };
+      }
+
+      _findArrayValues(newValue) {
+        if ( newValue && newValue.length >= this.mincharacter && this.data.length > 0){
+          const searchPattern = new RegExp(newValue);
+          this.maininfo = this.maininfo || this.maininfo !== '' ? this.maininfo : this.filterBy[0];
+          this.auxinfo = this.auxinfo.length > 0 ? this.auxinfo : this._generateAuxInfo();
+          let arrFound = this.data.filter( (currentObject) => {
+            return this._filterPropertiesObject(currentObject, searchPattern);
+          });
+          this.source = arrFound.slice(0, this.maxresult);
+        } else {
+          this.source = [];
+        }
+        this.notifySplices('source');
+      }
+
+      _onclick(event) {
+        const currentRow = event.path[1].id;
+        this.applyFilter = this.source[currentRow].name;
+        event.preventDefault();
+      }
+
+      _filterPropertiesObject(currentObject, pattern){
+        let rowFound = false;
+        this.filterBy.forEach(searchByProperty => {
+          if (searchByProperty in currentObject && !rowFound){
+            rowFound = pattern.test(currentObject[searchByProperty]);
+          }
+        })
+        return rowFound;
+      }
+
+      _showMainInfo(currentIdx){
+        this._currentShowRow = currentIdx;
+        return this.source.length > 0 ? this.source[currentIdx][this.maininfo] : '';
+      }
+
+      _showAuxInfo(showField, sourceData){
+        return sourceData[showField];
+      }
+
+      _generateAuxInfo(){
+        return this.filterBy.slice(1).map((currentValue) => {
+          return currentValue
+        });
+      }
+    }
+
+    window.customElements.define(ShowItemsElement.is, ShowItemsElement);
+  </script>
+</dom-module>

@@ -1,0 +1,17 @@
+{
+  "name": "input-autocomplete",
+  "version": "1.0.0",
+  "description": "input with autocomplete",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "start": "polymer serve --port 8081 | npm run watch",
+    "data": "json-server --watch ./data.json/db.json --port 3004",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "browser-sync start --proxy localhost:8081 --files \"autocomplete-element.html, show-items.html, index.html\""
+  },
+  "author": "",
+  "license": "ISC"
+}
